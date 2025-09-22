@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  evolution-api:
+    image: atendai/evolution-api:latest
+    container_name: evolution-api
+    restart: unless-stopped
+
+    # carrega as variáveis do seu arquivo .env
+    env_file:
+      - .env
+
+    # volume para armazenar as instâncias/sessões
+    volumes:
+      - evolution-instances:/evolution/instances
+
+    # conecta na rede do Dokploy (Traefik também está nela)
+    networks:
+      - dokploy-network
+
+    # checagem de saúde do container
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  evolution-instances:
+
+networks:
+  dokploy-network:
+    external: true
+
